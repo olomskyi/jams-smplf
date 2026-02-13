@@ -16,7 +16,6 @@ import com.olomsky.jams.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/product")
@@ -26,8 +25,8 @@ public class ProductController {
     
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createProduct(@RequestBody ProductRequest productDto) {
-        productService.createProduct(productDto);
+    public ProductResponse createProduct(@RequestBody ProductRequest productDto) {
+        return productService.createProduct(productDto);
     }
 
     @GetMapping

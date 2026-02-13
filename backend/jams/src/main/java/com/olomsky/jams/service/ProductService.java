@@ -19,7 +19,7 @@ public class ProductService {
 
     private final ProductRepository productRepo;
 
-    public void createProduct(ProductRequest productDTO) {
+    public ProductResponse createProduct(ProductRequest productDTO) {
         Product product = Product.builder()
             .name(productDTO.name())
             .description(productDTO.description())
@@ -28,13 +28,21 @@ public class ProductService {
         productRepo.save(product);
 
         log.info("Product created successfully");
+        return  new ProductResponse(
+            product.getId(),
+            product.getName(),
+            product.getDescription(),
+            product.getPrice());
     }
 
     public List<ProductResponse> getAllProducts() {
-        return productRepo.findAll()
+        List<ProductResponse> products = productRepo.findAll()
             .stream()
             .map(product -> new ProductResponse(
                 product.getId(), product.getName(), product.getDescription(), product.getPrice()))
             .toList();
+
+        log.info("Products (" + products.size() + ") successfully received");
+        return products;
     }
 }
