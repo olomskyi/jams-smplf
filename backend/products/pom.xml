@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.olomsky</groupId>
-	<artifactId>jams</artifactId>
+	<artifactId>products</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>jams</name>
+	<name>products</name>
 	<description>Spring Boot Microservices Simple project</description>
 	<url/>
 	<licenses>

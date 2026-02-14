@@ -1,4 +1,4 @@
-package com.olomsky.jams.dto;
+package com.olomsky.products.dto;
 
 import java.math.BigDecimal;
 

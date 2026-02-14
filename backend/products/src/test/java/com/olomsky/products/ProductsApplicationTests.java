@@ -1,10 +1,10 @@
-package com.olomsky.jams;
+package com.olomsky.products;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class JamsApplicationTests {
+class ProductsApplicationTests {
 
 	@Test
 	void contextLoads() {

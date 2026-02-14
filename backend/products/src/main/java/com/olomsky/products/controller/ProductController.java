@@ -1,4 +1,4 @@
-package com.olomsky.jams.controller;
+package com.olomsky.products.controller;
 
 import java.util.List;
 
@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.olomsky.jams.dto.ProductRequest;
-import com.olomsky.jams.dto.ProductResponse;
-import com.olomsky.jams.service.ProductService;
+import com.olomsky.products.dto.ProductRequest;
+import com.olomsky.products.dto.ProductResponse;
+import com.olomsky.products.service.ProductService;
 
 import lombok.RequiredArgsConstructor;
 

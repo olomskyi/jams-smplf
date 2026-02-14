@@ -1,4 +1,4 @@
-package com.olomsky.jams.model;
+package com.olomsky.products.model;
 
 import java.math.BigDecimal;
 

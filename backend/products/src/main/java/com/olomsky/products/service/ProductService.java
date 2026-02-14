@@ -1,13 +1,13 @@
-package com.olomsky.jams.service;
+package com.olomsky.products.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.olomsky.jams.dto.ProductRequest;
-import com.olomsky.jams.dto.ProductResponse;
-import com.olomsky.jams.model.Product;
-import com.olomsky.jams.repository.ProductRepository;
+import com.olomsky.products.dto.ProductRequest;
+import com.olomsky.products.dto.ProductResponse;
+import com.olomsky.products.model.Product;
+import com.olomsky.products.repository.ProductRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
