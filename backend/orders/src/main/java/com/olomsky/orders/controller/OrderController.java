@@ -35,7 +35,7 @@ public class OrderController {
     @ResponseStatus(HttpStatus.CREATED)
     public String setOrder(@RequestBody OrderRequest orderRequest) {
         log.info("Processing POST request with entity: {}", orderRequest);
-        orderService.setOrder(orderRequest);
+        OrderResponse response = orderService.setOrder(orderRequest);
         return "Order created successfully";
     }
 }

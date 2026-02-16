@@ -2,6 +2,7 @@ package com.olomsky.orders.service;
 
 import java.util.List;
 
+import com.olomsky.orders.client.InventoryClient;
 import org.springframework.stereotype.Service;
 
 import com.olomsky.orders.dto.OrderRequest;
@@ -18,24 +19,31 @@ import lombok.extern.slf4j.Slf4j;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final InventoryClient inventoryClient;
 
     public OrderResponse setOrder(OrderRequest orderRequest) {
         log.info("Setting order: " + orderRequest);
 
-        Order order = new Order();
-        order.setOrderNumber(orderRequest.orderNumber());
-        order.setSkuCode(orderRequest.skuCode());
-        order.setPrice(orderRequest.price());
-        order.setQuantity(orderRequest.quantity());
+        boolean isInStock = inventoryClient.isInStock(orderRequest.skuCode(), orderRequest.quantity());
 
-        orderRepository.save(order);
+        if (isInStock) {
+            Order order = new Order();
+            order.setOrderNumber(orderRequest.orderNumber());
+            order.setSkuCode(orderRequest.skuCode());
+            order.setPrice(orderRequest.price());
+            order.setQuantity(orderRequest.quantity());
 
-        return new OrderResponse(
-                order.getId(),
-                order.getOrderNumber(),
-                order.getSkuCode(),
-                order.getPrice(),
-                order.getQuantity());
+            orderRepository.save(order);
+            return new OrderResponse(
+                    order.getId(),
+                    order.getOrderNumber(),
+                    order.getSkuCode(),
+                    order.getPrice(),
+                    order.getQuantity());
+        } else {
+            throw new RuntimeException("Product with SkuCode " + orderRequest.skuCode() +
+                    " and quantity " + orderRequest.quantity() + " is not in stock");
+        }
     }
 
     public List<OrderResponse> getOrders() {
