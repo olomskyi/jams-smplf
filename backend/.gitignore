@@ -32,6 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 
+### IDEA ###
+.idea/
+
 ### OTHER ###
 .env
 application-local.properties
