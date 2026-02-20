@@ -40,6 +40,34 @@ services:
     networks:
       - jams-network
 
+  orders-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.orders
+    container_name: jams-orders
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+    environment:
+      - MYSQL_URL=${MYSQL_URL}
+    networks:
+      - jams-network
+
+  inventory-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.inventory
+    container_name: jams-inventory
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+    environment:
+      - MYSQL_URL=${MYSQL_URL}
+    networks:
+      - jams-network
+
 networks:
   jams-network:
     driver: bridge
