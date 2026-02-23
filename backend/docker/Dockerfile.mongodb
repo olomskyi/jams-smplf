@@ -1,0 +1,5 @@
+FROM mongo:8.2
+COPY data-base/mongo/*.js /docker-entrypoint-initdb.d/
+EXPOSE 27017
+VOLUME /data/db
+CMD ["mongod"]

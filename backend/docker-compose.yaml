@@ -1,0 +1,183 @@
+services:
+  mongodb:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.mongodb
+    container_name: jams-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DB}
+    healthcheck:
+      test: ["CMD", "mongosh", "--username", "${MONGO_INITDB_ROOT_USERNAME}", "--password", "${MONGO_INITDB_ROOT_PASSWORD}", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - jams-network
+
+  mysql:
+    image: mysql:8.4.8
+    container_name: jams-mysqldb
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD}" ]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./data-base/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - jams-network
+
+  keycloak-mysql:
+    image: mysql:8.4.8
+    container_name: keycloak-mysql
+    environment:
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - keycloak_mysql_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - jams-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.0
+    container_name: keycloak
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_DB: mysql
+      KC_DB_URL: jdbc:mysql://keycloak-mysql:3306/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - "8181:8080"
+    depends_on:
+      - keycloak-mysql
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - keycloak_logs:/opt/keycloak/logs
+    networks:
+      - jams-network
+
+  products-app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.products
+    container_name: jams-products
+    ports:
+      - "8080:8080"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      - MONGO_URL=${MONGO_URL}
+    networks:
+      - jams-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  orders-app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.orders
+    container_name: jams-orders
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - MYSQL_DATABASE=${MYSQL_ORDERS_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    networks:
+      - jams-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  inventory-app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.inventory
+    container_name: jams-inventory
+    ports:
+      - "8082:8082"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - MYSQL_DATABASE=${MYSQL_INVENTORY_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    networks:
+      - jams-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  gateway-app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.gateway
+    container_name: gateway-app
+    ports:
+      - "9000:9000"
+    depends_on:
+      products-app:
+        condition: service_healthy
+      orders-app:
+        condition: service_healthy
+      inventory-app:
+        condition: service_healthy
+    networks:
+      - jams-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  jams-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  mysql_data:
+  keycloak_data:
+  keycloak_logs:
+  keycloak_mysql_data:
