@@ -21,8 +21,6 @@ public class Routes {
         return GatewayRouterFunctions.route("products-app")
                 .route(RequestPredicates.path("/api/products"),
                         HandlerFunctions.http("http://products-app:8080"))
-                .route(RequestPredicates.path("/api/products/**"),
-                        HandlerFunctions.http("http://products-app:8080"))
                 .build();
     }
 
@@ -32,8 +30,6 @@ public class Routes {
         return GatewayRouterFunctions.route("orders_app")
                 .route(RequestPredicates.path("/api/orders"),
                         HandlerFunctions.http("http://orders-app:8081"))
-                .route(RequestPredicates.path("/api/orders/**"),
-                        HandlerFunctions.http("http://orders-app:8080"))
                 .build();
     }
 
@@ -43,8 +39,6 @@ public class Routes {
         return GatewayRouterFunctions.route("inventory_app")
                 .route(RequestPredicates.path("/api/inventory"),
                         HandlerFunctions.http("http://inventory-app:8082"))
-                .route(RequestPredicates.path("/api/inventory/**"),
-                        HandlerFunctions.http("http://inventory-app:8080"))
                 .build();
     }
 }
