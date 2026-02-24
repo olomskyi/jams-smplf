@@ -21,8 +21,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        // Адрес вашего Keycloak внутри Docker сети
-        String jwkSetUri = "http://keycloak:8080/realms/jams/protocol/openid-connect/certs";
+        String jwkSetUri = "http://keycloak:8080/realms/jams-smplf-secret-realm/protocol/openid-connect/certs";
         return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }
 }
