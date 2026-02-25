@@ -14,12 +14,12 @@ public class OpenAPIConfig {
     public OpenAPI productServiceAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Product Service API")
-                        .description("This is the REST API for Product Service")
+                        .title("Products Service API")
+                        .description("This is the REST API for Products Service")
                         .version("v0.1")
                         .license(new License().name("Custom License")))
                 .externalDocs(new ExternalDocumentation()
-                        .description("Refer to Product Service Documentation")
-                        .url("https://product-service-dummy.com/docs"));
+                        .description("Refer to Products Service Documentation")
+                        .url("https://products-service-dummy.com/docs"));
     }
 }

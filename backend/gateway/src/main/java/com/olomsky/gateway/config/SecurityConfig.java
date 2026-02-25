@@ -11,10 +11,17 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
+    private final String[] unSecureUrls = {"/swagger-ui.html", "/swagger-ui/**",
+                                           "/vs/api-docs/**", "/swagger-resources/**",
+                                           "/api-docs/**", "aggregate/**"};
+
     @Bean
     public  SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(unSecureUrls)
+                        .permitAll()
+                        .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()))
                 .build();
     }
