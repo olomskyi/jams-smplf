@@ -1,5 +1,5 @@
 package com.olomsky.inventory.dto;
 
-public class InventoryRequest {
-    
-}
+public record InventoryRequest (
+        String skuCode,
+        Integer quantity){}

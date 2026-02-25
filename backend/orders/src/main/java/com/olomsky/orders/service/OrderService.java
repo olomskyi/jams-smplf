@@ -3,12 +3,13 @@ package com.olomsky.orders.service;
 import java.util.List;
 
 import com.olomsky.orders.client.InventoryClient;
-import org.springframework.stereotype.Service;
-
 import com.olomsky.orders.dto.OrderRequest;
 import com.olomsky.orders.dto.OrderResponse;
 import com.olomsky.orders.model.Order;
 import com.olomsky.orders.repository.OrderRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,8 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final InventoryClient inventoryClient;
 
+    @CircuitBreaker(name = "inventory", fallbackMethod = "fallbackMethod")
+    @Retry(name = "inventory")
     public OrderResponse setOrder(OrderRequest orderRequest) {
         log.info("Setting order: " + orderRequest);
 
@@ -56,5 +59,12 @@ public class OrderService {
 
         log.info("Orders (" + orders.size() + ") successfully received");
         return orders;
+    }
+
+    public OrderResponse fallbackMethod(OrderRequest orderRequest, Throwable throwable) {
+        log.warn("Fallback triggered for SKU: {}. Reason: {}",
+                orderRequest.skuCode(), throwable.getMessage());
+        throw new RuntimeException("Inventory service is unavailable. Please try again later. " +
+                throwable.getMessage());
     }
 }
