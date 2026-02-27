@@ -8,9 +8,13 @@ This project was generated using [Angular CLI](https://github.com/angular/angula
 ng new frontend --skip-install --style css --routing true
 cd frontent
 npm install
+
+ng add tailwindcss
+or
 npm install -D tailwindcss@3 postcss autoprefixer
 npm install -D tailwindcss-cli
 npx tailwindcss init
+
 npm install zone.js@~0.16.0
 npm install angular-auth-oidc-client@21.0.1
 
