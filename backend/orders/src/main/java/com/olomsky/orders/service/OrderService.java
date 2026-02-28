@@ -5,10 +5,12 @@ import java.util.List;
 import com.olomsky.orders.client.InventoryClient;
 import com.olomsky.orders.dto.OrderRequest;
 import com.olomsky.orders.dto.OrderResponse;
+import com.olomsky.orders.event.OrderEvent;
 import com.olomsky.orders.model.Order;
 import com.olomsky.orders.repository.OrderRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final InventoryClient inventoryClient;
+    private final KafkaTemplate<String, OrderEvent> kafkaTemplate;
 
     @CircuitBreaker(name = "inventory", fallbackMethod = "fallbackMethod")
     @Retry(name = "inventory")
@@ -37,6 +40,21 @@ public class OrderService {
             order.setQuantity(orderRequest.quantity());
 
             orderRepository.save(order);
+
+            // KAFKA MESSAGE
+            OrderEvent orderEvent = new OrderEvent(
+                    orderRequest.orderNumber(),
+                    orderRequest.skuCode(),
+                    orderRequest.price(),
+                    orderRequest.quantity(),
+                    orderRequest.userDetails().email(),
+                    orderRequest.userDetails().firstName(),
+                    orderRequest.userDetails().lastName());
+
+            log.info("KAFKA: sending event = {}", orderEvent);
+            kafkaTemplate.send("order-topic", orderEvent);
+
+            // FOR TESTING
             return new OrderResponse(
                     order.getId(),
                     order.getOrderNumber(),
