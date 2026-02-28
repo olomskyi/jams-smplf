@@ -1,5 +1,4 @@
-import { AsyncPipe, JsonPipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OrderService } from '../../services/orderService';
@@ -10,8 +9,9 @@ import { ProductModel } from '../../model/productModel';
 
 @Component({
   selector: 'app-home',
-  imports: [AsyncPipe, JsonPipe, FormsModule],
+  imports: [FormsModule],
   templateUrl: './home.html',
+  standalone: true,
   styleUrl: './home.css',
 })
 export class Home implements OnInit {
@@ -19,6 +19,7 @@ export class Home implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly orderService = inject(OrderService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
   isAuthenticated = false;
   products: Array<ProductModel> = [];
   quantityIsNull = false;
@@ -32,22 +33,34 @@ export class Home implements OnInit {
         this.productService.getProducts()
           .pipe()
           .subscribe(product => {
+            console.log('=== PRODUCTS RECEIVED ===');
+            console.log('Count:', product.length);
+            console.log('Data:', product);
+            console.log('========================');
             this.products = product;
+            this.cdr.markForCheck();
           })
       })
   }
 
-  createOrder(product: ProductModel, quantity: number): void {
+  goToCreateProductPage() {
+    this.router.navigateByUrl('/product');
+  }
+
+  createOrder(product: ProductModel, quantity: string): void {
+    const quantityNum = Number(quantity);
+
+    console.log('createOrder: Product = ', product);
 
     this.oidcSecurityService.userData$.subscribe(result => {
-      console.log(result);
+      console.log("User Data: " + result);
       const userDetails = {
         email: result.userData.preferred_username,
         firstName: result.userData.given_name,
         lastName: result.userData.family_name
       };
 
-      if (quantity == null || quantity <= 0) {
+      if (quantityNum == null || quantityNum <= 0) {
         this.orderFailed = true;
         this.orderSuccess = false;
         this.quantityIsNull = true;
@@ -55,7 +68,7 @@ export class Home implements OnInit {
         const order: OrderModel = {
           skuCode: product.skuCode,
           price: product.price,
-          quantity: Number(quantity),
+          quantity: quantityNum,
           userDetails: userDetails
         }
         this.orderService.createOrder(order).subscribe({

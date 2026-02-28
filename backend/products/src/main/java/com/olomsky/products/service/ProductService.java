@@ -23,15 +23,17 @@ public class ProductService {
         Product product = Product.builder()
             .name(productDTO.name())
             .description(productDTO.description())
+            .skuCode(productDTO.skuCode())
             .price(productDTO.price())
             .build();
         productRepo.save(product);
 
         log.info("Product created successfully");
-        return  new ProductResponse(
+        return new ProductResponse(
             product.getId(),
             product.getName(),
             product.getDescription(),
+            product.getSkuCode(),
             product.getPrice());
     }
 
@@ -39,7 +41,11 @@ public class ProductService {
         List<ProductResponse> products = productRepo.findAll()
             .stream()
             .map(product -> new ProductResponse(
-                product.getId(), product.getName(), product.getDescription(), product.getPrice()))
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getSkuCode(),
+                product.getPrice()))
             .toList();
 
         log.info("Products (" + products.size() + ") successfully received");

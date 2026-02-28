@@ -1,5 +1,6 @@
 package com.olomsky.gateway.config;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -7,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
@@ -16,8 +18,12 @@ public class SecurityConfig {
                                            "/api-docs/**", "aggregate/**"};
 
     @Bean
-    public  SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public  SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity,
+                                                    @Qualifier("corsConfigSource")
+                                                    CorsConfigurationSource corsConfigSource) throws Exception {
         return httpSecurity
+                .cors(cors -> cors.configurationSource(corsConfigSource))
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(unSecureUrls)
                         .permitAll()
@@ -28,7 +34,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        String jwkSetUri = "http://keycloak:8080/realms/jams-smplf-secret-realm/protocol/openid-connect/certs";
+        String jwkSetUri = "http://keycloak:8080/realms/jams-front-angular-realm/protocol/openid-connect/certs";
         return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }
 }
