@@ -1,17 +1,19 @@
 package com.olomsky.orders.service;
 
+import java.math.RoundingMode;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import com.olomsky.orders.client.InventoryClient;
 import com.olomsky.orders.dto.OrderRequest;
 import com.olomsky.orders.dto.OrderResponse;
-import com.olomsky.orders.event.OrderEvent;
 import com.olomsky.orders.model.Order;
 import com.olomsky.orders.repository.OrderRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import com.olomsky.orders.event.OrderEvent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +33,11 @@ public class OrderService {
         log.info("Setting order: " + orderRequest);
 
         boolean isInStock = inventoryClient.isInStock(orderRequest.skuCode(), orderRequest.quantity());
+        String orderNumber = String.valueOf(System.currentTimeMillis());
 
         if (isInStock) {
             Order order = new Order();
-            order.setOrderNumber(orderRequest.orderNumber());
+            order.setOrderNumber(orderNumber);
             order.setSkuCode(orderRequest.skuCode());
             order.setPrice(orderRequest.price());
             order.setQuantity(orderRequest.quantity());
@@ -43,9 +46,9 @@ public class OrderService {
 
             // KAFKA MESSAGE
             OrderEvent orderEvent = new OrderEvent(
-                    orderRequest.orderNumber(),
+                    orderNumber,
                     orderRequest.skuCode(),
-                    orderRequest.price(),
+                    ByteBuffer.wrap(orderRequest.price().setScale(2, RoundingMode.HALF_UP).unscaledValue().toByteArray()),
                     orderRequest.quantity(),
                     orderRequest.userDetails().email(),
                     orderRequest.userDetails().firstName(),

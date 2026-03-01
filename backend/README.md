@@ -4,3 +4,5 @@ docker run -d --name mongo-db --env-file .env -p 27017:27017 -v ./data-base/mong
 ### MYSQL DB  
 docker build -t jams-mysqldb -f docker/Dockerfile.mysql .  
 docker run -d --name jams-mysqldb-container -p 3306:3306 --env-file .env -v jams_mysql_data:/var/lib/mysql jams-mysqldb  
+### KAFKA notification event object
+mvn clean generate-sources -DskipTests -B

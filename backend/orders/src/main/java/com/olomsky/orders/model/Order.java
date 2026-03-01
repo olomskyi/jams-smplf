@@ -27,7 +27,7 @@ public class Order {
     private String skuCode;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private Double price;
+    private BigDecimal price;
 
     @Column(nullable = false)
     private Integer quantity;

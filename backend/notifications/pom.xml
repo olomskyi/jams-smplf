@@ -136,7 +136,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-            <!-- Avro Maven Plugin для генерации классов -->
+            <!-- Avro Maven Plugin -->
             <plugin>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro-maven-plugin</artifactId>
@@ -149,7 +149,7 @@
                         </goals>
                         <configuration>
                             <sourceDirectory>${project.basedir}/src/main/resources/avro</sourceDirectory>
-                            <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources/avro</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

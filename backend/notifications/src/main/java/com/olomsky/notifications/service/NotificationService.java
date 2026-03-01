@@ -1,6 +1,5 @@
 package com.olomsky.notifications.service;
 
-import com.olomsky.notifications.order.OrderEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -9,6 +8,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import com.olomsky.orders.event.OrderEvent;
 
 @Service
 @RequiredArgsConstructor

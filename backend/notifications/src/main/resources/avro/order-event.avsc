@@ -1,5 +1,5 @@
 {
-  "namespace": "com.olomsky.notifications.order",
+  "namespace": "com.olomsky.orders.event",
   "type": "record",
   "name": "OrderEvent",
   "fields": [
@@ -13,7 +13,12 @@
     },
     {
       "name": "price",
-      "type": "double"
+      "type": {
+        "type": "bytes",
+        "logicalType": "decimal",
+        "precision": 10,
+        "scale": 2
+      }
     },
     {
       "name": "quantity",
